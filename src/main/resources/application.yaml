@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: ms-vidasalud-bff
+
+  cloud:
+    azure:
+      active-directory:
+        enabled: true
+        profile:
+          tenant-id: 740ebf2a-ab64-4fd4-addc-979fa10c81ee
+        credential:
+          client-id: 69c76cef-dc73-4bbd-bc29-86b207d73812
+        app-id-uri: api://69c76cef-dc73-4bbd-bc29-86b207d73812
