@@ -15,4 +15,12 @@ public class RestClientConfig {
                 .baseUrl(appointmentsUrl)
                 .build();
     }
+
+    @Bean
+    public RestClient catalogRestClient(
+            @Value("${vidasalud.services.catalog-url}") String catalogUrl) {
+        return RestClient.builder()
+                .baseUrl(catalogUrl)
+                .build();
+    }
 }
