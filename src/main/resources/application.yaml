@@ -7,7 +7,11 @@ spring:
       active-directory:
         enabled: true
         profile:
-          tenant-id: 740ebf2a-ab64-4fd4-addc-979fa10c81ee
+          tenant-id: ${AZURE_TENANT_ID:245aec22-d743-4c13-a6e6-dce0a19bc1cf}
         credential:
-          client-id: 69c76cef-dc73-4bbd-bc29-86b207d73812
-        app-id-uri: api://69c76cef-dc73-4bbd-bc29-86b207d73812
+          client-id: ${AZURE_CLIENT_ID:fd189494-2ea3-4c54-91ed-5b5ddd644163}
+        app-id-uri: ${AZURE_APP_ID_URI:api://fd189494-2ea3-4c54-91ed-5b5ddd644163}
+
+vidasalud:
+  services:
+    appointments-url: ${APPOINTMENTS_URL:http://localhost:8081}

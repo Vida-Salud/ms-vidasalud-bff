@@ -32,6 +32,10 @@ public class SecurityConfig {
                                 .hasAnyAuthority("APPROLE_Admin", "APPROLE_Operador", "APPROLE_Cliente")
                         .requestMatchers(HttpMethod.GET, "/api/appointments")
                                 .hasAnyAuthority("APPROLE_Admin", "APPROLE_Operador", "APPROLE_Cliente")
+                        .requestMatchers(HttpMethod.GET, "/api/appointments/{id}")
+                                .hasAnyAuthority("APPROLE_Admin", "APPROLE_Operador", "APPROLE_Cliente")
+                        .requestMatchers(HttpMethod.PUT, "/api/appointments/{id}")
+                                .hasAnyAuthority("APPROLE_Admin", "APPROLE_Operador")
 
                         .requestMatchers(HttpMethod.GET, "/api/catalog/**")
                                 .hasAnyAuthority("APPROLE_Admin", "APPROLE_Operador")

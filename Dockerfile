@@ -16,8 +16,17 @@ RUN mvn clean package -DskipTests -B
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+# Usuario sin privilegios: si alguien compromete la app, no es root en el
+# contenedor.
+RUN addgroup -S spring && adduser -S spring -G spring
+
 COPY --from=build /app/target/ms-vidasalud-bff-0.0.1-SNAPSHOT.jar app.jar
 
+USER spring
+
+# La configuración de Azure AD y la URL de appointments NO se fijan aquí: se
+# leen de variables de entorno al arrancar (ver application.yaml), así la
+# misma imagen sirve para cualquier entorno sin reconstruirla.
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
