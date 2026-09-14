@@ -21,12 +21,7 @@ import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
 
-/**
- * Proxy hacia ms-vidasalud-catalog.
- *
- * Reenvía requests a /api/catalog/* hacia /api/catalog/* del catalog y
- * devuelve la misma respuesta. El Authorization header se pasa tal cual.
- */
+
 @RestController
 @RequestMapping("/api/catalog")
 public class CatalogController {
@@ -34,7 +29,6 @@ public class CatalogController {
 	@Autowired
 	private RestClient catalogRestClient;
 
-	// === SERVICIOS ===
 
 	@PostMapping("/services")
 	public ResponseEntity<String> crearServicio(
@@ -76,7 +70,6 @@ public class CatalogController {
 				.body(body));
 	}
 
-	// === BOXES ===
 
 	@PostMapping("/boxes")
 	public ResponseEntity<String> crearBox(
@@ -113,7 +106,6 @@ public class CatalogController {
 				.header(HttpHeaders.AUTHORIZATION, authorization));
 	}
 
-	// === CUPOS ===
 
 	@GetMapping("/cupos")
 	public ResponseEntity<String> listarCupos(
