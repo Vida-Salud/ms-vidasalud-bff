@@ -36,11 +36,9 @@ public class AppointmentsController {
     @Autowired
     private RestClient appointmentsRestClient;
 
-    /** Body que recibe el BFF para cambiar estado. */
     public record StatusRequest(String status) {
     }
 
-    /** Body que espera appointments (CambiarEstadoRequest). */
     public record CambiarEstadoBody(String nuevoEstado) {
     }
 
@@ -84,7 +82,6 @@ public class AppointmentsController {
                 .body(body));
     }
 
-    /** Traduce {"status": "..."} a {"nuevoEstado": "..."}. */
     @PutMapping("/{id}/status")
     public ResponseEntity<String> cambiarEstado(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
@@ -97,13 +94,6 @@ public class AppointmentsController {
                 .body(new CambiarEstadoBody(request.status())));
     }
 
-    /**
-     * Ejecuta la petición y copia status, Content-Type y body de la respuesta.
-     *
-     * onStatus(status -> true, ...) evita que RestClient lance excepción ante
-     * 4xx/5xx: esos errores son respuestas válidas de appointments y deben
-     * llegar al cliente tal cual, no convertirse en un 500 del BFF.
-     */
     private ResponseEntity<String> reenviar(RestClient.RequestHeadersSpec<?> peticion) {
         ResponseEntity<String> respuesta = peticion.retrieve()
                 .onStatus(status -> true, (req, res) -> { })
@@ -117,7 +107,6 @@ public class AppointmentsController {
         return builder.body(respuesta.getBody());
     }
 
-    /** Appointments caído o inalcanzable (connection refused, timeout). */
     @ExceptionHandler(ResourceAccessException.class)
     public ProblemDetail appointmentsNoDisponible(ResourceAccessException e) {
         ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE,

@@ -39,11 +39,7 @@
 			<groupId>com.azure.spring</groupId>
 			<artifactId>spring-cloud-azure-starter-active-directory</artifactId>
 		</dependency>
-		<!-- Requerida junto a la de Azure: el starter de Active Directory NO
-		     trae spring-security-oauth2-resource-server, pero su autoconfiguracion
-		     (AadResourceServerConfiguration) expone un bean JwtDecoder, que es una
-		     clase de ese modulo. Sin esta dependencia la app compila pero falla al
-		     arrancar con NoClassDefFoundError. -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
