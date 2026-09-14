@@ -17,5 +17,5 @@ spring:
 
 vidasalud:
   services:
-    appointments-url: ${APPOINTMENTS_URL:http://localhost:8090}
+    appointments-url: ${APPOINTMENTS_URL:http://localhost:8081}
     catalog-url: ${CATALOG_URL:http://localhost:8091}
