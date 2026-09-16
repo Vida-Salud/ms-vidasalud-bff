@@ -42,6 +42,11 @@ public class AppointmentsController {
     public record CambiarEstadoBody(String nuevoEstado) {
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("Token válido para la página de Atenciones");
+    }
+
     @GetMapping
     public ResponseEntity<String> listar(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {

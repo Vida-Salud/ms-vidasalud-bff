@@ -29,6 +29,11 @@ public class CatalogController {
 	@Autowired
 	private RestClient catalogRestClient;
 
+	@GetMapping("/ping")
+	public ResponseEntity<String> ping() {
+		return ResponseEntity.ok("Token válido para la página de Catálogo");
+	}
+
 
 	@PostMapping("/services")
 	public ResponseEntity<String> crearServicio(
