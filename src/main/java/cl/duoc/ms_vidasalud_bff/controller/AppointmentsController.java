@@ -1,10 +1,10 @@
 package cl.duoc.ms_vidasalud_bff.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +33,11 @@ import org.springframework.web.client.RestClient;
 @RequestMapping("/api/appointments")
 public class AppointmentsController {
 
-    @Autowired
-    private RestClient appointmentsRestClient;
+    private final RestClient appointmentsRestClient;
+
+    public AppointmentsController(@Qualifier("appointmentsRestClient") RestClient appointmentsRestClient) {
+        this.appointmentsRestClient = appointmentsRestClient;
+    }
 
     public record StatusRequest(String status) {
     }
