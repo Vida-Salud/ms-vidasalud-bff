@@ -36,3 +36,7 @@ spring:
 vidasalud:
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:4200}   # lista separada por comas
+
+logging:
+  pattern:
+    correlation: "[%X{traceId:-}] "
