@@ -1,10 +1,10 @@
 package cl.duoc.ms_vidasalud_bff.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +26,11 @@ import java.time.LocalDate;
 @RequestMapping("/api/catalog")
 public class CatalogController {
 
-	@Autowired
-	private RestClient catalogRestClient;
+	private final RestClient catalogRestClient;
+
+	public CatalogController(@Qualifier("catalogRestClient") RestClient catalogRestClient) {
+		this.catalogRestClient = catalogRestClient;
+	}
 
 	@GetMapping("/ping")
 	public ResponseEntity<String> ping() {
