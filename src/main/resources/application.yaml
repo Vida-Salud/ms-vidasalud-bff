@@ -2,6 +2,8 @@ server:
   port: 8090
 
 spring:
+  config:
+    import: optional:file:.env[.properties]   # solo para correr desde el IDE
   application:
     name: ms-vidasalud-bff
 
@@ -10,10 +12,10 @@ spring:
       active-directory:
         enabled: true
         profile:
-          tenant-id: ${AZURE_TENANT_ID:245aec22-d743-4c13-a6e6-dce0a19bc1cf}
+          tenant-id: ${AZURE_TENANT_ID}
         credential:
-          client-id: ${AZURE_CLIENT_ID:fd189494-2ea3-4c54-91ed-5b5ddd644163}
-        app-id-uri: ${AZURE_APP_ID_URI:api://fd189494-2ea3-4c54-91ed-5b5ddd644163}
+          client-id: ${AZURE_CLIENT_ID}
+        app-id-uri: ${AZURE_APP_ID_URI:api://${AZURE_CLIENT_ID}}
 
 vidasalud:
   services:
