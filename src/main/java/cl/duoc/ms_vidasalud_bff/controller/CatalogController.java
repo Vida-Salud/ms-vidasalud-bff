@@ -1,175 +1,74 @@
 package cl.duoc.ms_vidasalud_bff.controller;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
-import org.springframework.beans.factory.annotation.Qualifier;
+import cl.duoc.ms_vidasalud_bff.client.CatalogClient;
+import cl.duoc.ms_vidasalud_bff.client.Reenvio;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClient;
 
-import java.time.LocalDate;
-
-
+/**
+ * Traduce las rutas del BFF a las de ms-vidasalud-catalog. El token lo copia el cliente HTTP
+ * (ClientesHttpConfig) y las reglas por rol ya se aplicaron en el SecurityFilterChain.
+ */
 @RestController
-@RequestMapping("/api/catalog")
+@RequestMapping("/api/{version}/catalog")
 public class CatalogController {
 
-	private final RestClient catalogRestClient;
+	private final CatalogClient catalog;
 
-	public CatalogController(@Qualifier("catalogRestClient") RestClient catalogRestClient) {
-		this.catalogRestClient = catalogRestClient;
-	}
-
-	@GetMapping("/ping")
-	public ResponseEntity<String> ping() {
-		return ResponseEntity.ok("Token válido para la página de Catálogo");
-	}
-
-
-	@PostMapping("/services")
-	public ResponseEntity<String> crearServicio(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@RequestBody String body) {
-		return reenviar(catalogRestClient.post()
-				.uri("/api/catalog/services")
-				.header(HttpHeaders.AUTHORIZATION, authorization)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(body));
+	public CatalogController(CatalogClient catalog) {
+		this.catalog = catalog;
 	}
 
 	@GetMapping("/services")
-	public ResponseEntity<String> listarServicios(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-		return reenviar(catalogRestClient.get()
-				.uri("/api/catalog/services")
-				.header(HttpHeaders.AUTHORIZATION, authorization));
+	public ResponseEntity<String> listarServicios() {
+		return Reenvio.respuesta(catalog.listarServicios());
+	}
+
+	@PostMapping("/services")
+	public ResponseEntity<String> crearServicio(@RequestBody String body) {
+		return Reenvio.respuesta(catalog.crearServicio(body));
 	}
 
 	@GetMapping("/services/{id}")
-	public ResponseEntity<String> obtenerServicio(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@PathVariable Long id) {
-		return reenviar(catalogRestClient.get()
-				.uri("/api/catalog/services/{id}", id)
-				.header(HttpHeaders.AUTHORIZATION, authorization));
+	public ResponseEntity<String> obtenerServicio(@PathVariable Long id) {
+		return Reenvio.respuesta(catalog.obtenerServicio(id));
 	}
 
 	@PutMapping("/services/{id}")
-	public ResponseEntity<String> actualizarServicio(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@PathVariable Long id,
-			@RequestBody String body) {
-		return reenviar(catalogRestClient.put()
-				.uri("/api/catalog/services/{id}", id)
-				.header(HttpHeaders.AUTHORIZATION, authorization)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(body));
-	}
-
-
-	@PostMapping("/boxes")
-	public ResponseEntity<String> crearBox(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@RequestBody String body) {
-		return reenviar(catalogRestClient.post()
-				.uri("/api/catalog/boxes")
-				.header(HttpHeaders.AUTHORIZATION, authorization)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(body));
+	public ResponseEntity<String> actualizarServicio(@PathVariable Long id, @RequestBody String body) {
+		return Reenvio.respuesta(catalog.actualizarServicio(id, body));
 	}
 
 	@GetMapping("/boxes")
-	public ResponseEntity<String> listarBoxes(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@RequestParam(required = false) Long servicioId) {
+	public ResponseEntity<String> listarBoxes(@RequestParam(required = false) Long servicioId) {
+		return Reenvio.respuesta(catalog.listarBoxes(servicioId));
+	}
 
-		if (servicioId != null) {
-			return reenviar(catalogRestClient.get()
-					.uri("/api/catalog/boxes?servicioId={id}", servicioId)
-					.header(HttpHeaders.AUTHORIZATION, authorization));
-		}
-		return reenviar(catalogRestClient.get()
-				.uri("/api/catalog/boxes")
-				.header(HttpHeaders.AUTHORIZATION, authorization));
+	@PostMapping("/boxes")
+	public ResponseEntity<String> crearBox(@RequestBody String body) {
+		return Reenvio.respuesta(catalog.crearBox(body));
 	}
 
 	@GetMapping("/boxes/{id}")
-	public ResponseEntity<String> obtenerBox(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@PathVariable Long id) {
-		return reenviar(catalogRestClient.get()
-				.uri("/api/catalog/boxes/{id}", id)
-				.header(HttpHeaders.AUTHORIZATION, authorization));
+	public ResponseEntity<String> obtenerBox(@PathVariable Long id) {
+		return Reenvio.respuesta(catalog.obtenerBox(id));
 	}
 
-
-	@GetMapping("/cupos")
-	public ResponseEntity<String> listarCupos(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@RequestParam(required = false) LocalDate fecha) {
-
-		if (fecha != null) {
-			return reenviar(catalogRestClient.get()
-					.uri("/api/catalog/cupos?fecha={fecha}", fecha)
-					.header(HttpHeaders.AUTHORIZATION, authorization));
-		}
-		return reenviar(catalogRestClient.get()
-				.uri("/api/catalog/cupos")
-				.header(HttpHeaders.AUTHORIZATION, authorization));
+	@GetMapping("/slots")
+	public ResponseEntity<String> listarCupos(@RequestParam(required = false) String date,
+			@RequestParam(required = false) Long boxId) {
+		return Reenvio.respuesta(catalog.listarCupos(date, boxId));
 	}
 
-	@GetMapping("/cupos/box/{boxId}/fecha/{fecha}")
-	public ResponseEntity<String> obtenerCupoPorBoxYFecha(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@PathVariable Long boxId,
-			@PathVariable LocalDate fecha) {
-		return reenviar(catalogRestClient.get()
-				.uri("/api/catalog/cupos/box/{boxId}/fecha/{fecha}", boxId, fecha)
-				.header(HttpHeaders.AUTHORIZATION, authorization));
-	}
-
-	@PutMapping("/cupos/{id}")
-	public ResponseEntity<String> actualizarCupo(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-			@PathVariable Long id,
-			@RequestBody String body) {
-		return reenviar(catalogRestClient.put()
-				.uri("/api/catalog/cupos/{id}", id)
-				.header(HttpHeaders.AUTHORIZATION, authorization)
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(body));
-	}
-
-	private ResponseEntity<String> reenviar(RestClient.RequestHeadersSpec<?> peticion) {
-		ResponseEntity<String> respuesta = peticion.retrieve()
-				.onStatus(status -> true, (req, res) -> { })
-				.toEntity(String.class);
-
-		ResponseEntity.BodyBuilder builder = ResponseEntity.status(respuesta.getStatusCode());
-		MediaType contentType = respuesta.getHeaders().getContentType();
-		if (contentType != null) {
-			builder.contentType(contentType);
-		}
-		return builder.body(respuesta.getBody());
-	}
-
-	@ExceptionHandler(ResourceAccessException.class)
-	public ProblemDetail catalogNoDisponible(ResourceAccessException e) {
-		ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE,
-				"El servicio de catálogo no está disponible. Intente nuevamente más tarde.");
-		problema.setTitle("Servicio no disponible");
-		return problema;
+	@PutMapping("/slots/{id}")
+	public ResponseEntity<String> actualizarCupo(@PathVariable Long id, @RequestBody String body) {
+		return Reenvio.respuesta(catalog.actualizarCupo(id, body));
 	}
 }

@@ -7,6 +7,22 @@ spring:
   application:
     name: ms-vidasalud-bff
 
+  mvc:
+    apiversion:
+      use:
+        path-segment: 1
+      supported: 1
+  http:
+    serviceclient:
+      appointments:
+        base-url: ${APPOINTMENTS_URL:http://localhost:8081}
+        connect-timeout: 2s
+        read-timeout: 5s
+      catalog:
+        base-url: ${CATALOG_URL:http://localhost:8091}
+        connect-timeout: 2s
+        read-timeout: 5s
+
   cloud:
     azure:
       active-directory:
@@ -18,6 +34,5 @@ spring:
         app-id-uri: ${AZURE_APP_ID_URI:api://${AZURE_CLIENT_ID}}
 
 vidasalud:
-  services:
-    appointments-url: ${APPOINTMENTS_URL:http://localhost:8081}
-    catalog-url: ${CATALOG_URL:http://localhost:8091}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200}   # lista separada por comas
