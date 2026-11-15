@@ -2,6 +2,7 @@ package cl.duoc.ms_vidasalud_bff.config;
 
 import cl.duoc.ms_vidasalud_bff.client.AppointmentsClient;
 import cl.duoc.ms_vidasalud_bff.client.CatalogClient;
+import org.slf4j.MDC;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,10 @@ public class ClientesHttpConfig {
         return groups -> groups.forEachClient((group, builder) -> builder
                 .defaultStatusHandler(status -> true, (request, response) -> { })
                 .requestInterceptor((request, body, execution) -> {
+                    String traceId = MDC.get(TraceIdFilter.MDC_KEY);
+                    if (traceId != null) {
+                        request.getHeaders().set(TraceIdFilter.HEADER, traceId);
+                    }
                     if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attrs) {
                         String token = attrs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
                         if (token != null) {
