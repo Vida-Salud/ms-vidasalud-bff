@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -37,14 +38,14 @@ class AppointmentsSecurityTest {
 
     @Test
     void sinToken_devuelve401() throws Exception {
-        mockMvc.perform(get("/api/appointments"))
+        mockMvc.perform(get("/api/v1/appointments"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void tokenConRolNoPermitido_devuelve403() throws Exception {
         // Auditor no esta en la lista permitida para GET /api/appointments.
-        mockMvc.perform(get("/api/appointments")
+        mockMvc.perform(get("/api/v1/appointments")
                         .header("Authorization", "Bearer token-auditor"))
                 .andExpect(status().isForbidden());
     }
@@ -55,10 +56,38 @@ class AppointmentsSecurityTest {
         // esta levantado en este test, el BFF responde 503 via el
         // ExceptionHandler: eso confirma que la autorizacion se supero y la
         // peticion llego al proxy, no que fue bloqueada por rol o por token.
-        mockMvc.perform(get("/api/appointments")
+        mockMvc.perform(get("/api/v1/appointments")
                         .header("Authorization", "Bearer token-cliente")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isServiceUnavailable());
+    }
+
+    @Test
+    void clienteNoCambiaEstados() throws Exception {
+        mockMvc.perform(put("/api/v1/appointments/1/status")
+                        .header("Authorization", "Bearer token-cliente")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\": \"CONFIRMADA\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void operadorCambiaEstadosYLlegaAlServicio() throws Exception {
+        mockMvc.perform(put("/api/v1/appointments/1/status")
+                        .header("Authorization", "Bearer token-operador")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"status\": \"CONFIRMADA\"}"))
+                .andExpect(status().isServiceUnavailable()); // pasó la seguridad; appointments no responde
+    }
+
+    @Test
+    void versionNoSoportadaResponde400() throws Exception {
+        mockMvc.perform(get("/api/v9/appointments").header("Authorization", "Bearer token-cliente"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void clienteNoVeElCatalogo() throws Exception {
+        mockMvc.perform(get("/api/v1/catalog/services").header("Authorization", "Bearer token-cliente"))
+                .andExpect(status().isForbidden());
     }
 
     @TestConfiguration
@@ -71,6 +100,7 @@ class AppointmentsSecurityTest {
                 List<String> roles = switch (token) {
                     case "token-cliente" -> List.of("Cliente");
                     case "token-auditor" -> List.of("Auditor");
+                    case "token-operador" -> List.of("Operador");
                     default -> List.of();
                 };
                 Instant now = Instant.now();
