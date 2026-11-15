@@ -16,11 +16,11 @@ WORKDIR /app
 
 RUN addgroup -S spring && adduser -S spring -G spring
 
-COPY --from=build /app/target/ms-vidasalud-bff-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/ms-vidasalud-bff-*.jar app.jar
 
 USER spring
 
 
-EXPOSE 8080
+EXPOSE 8090
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

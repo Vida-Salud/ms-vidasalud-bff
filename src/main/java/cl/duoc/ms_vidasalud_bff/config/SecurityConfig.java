@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health/**").permitAll()
                         // Atenciones
                         .requestMatchers(HttpMethod.PUT, API + "/appointments/{id}/status")
                                 .hasAnyAuthority("APPROLE_Admin", "APPROLE_Operador")
