@@ -101,6 +101,7 @@ class AppointmentsSecurityTest {
                     case "token-cliente" -> List.of("Cliente");
                     case "token-auditor" -> List.of("Auditor");
                     case "token-operador" -> List.of("Operador");
+                    case "token-admin" -> List.of("Admin");
                     default -> List.of();
                 };
                 Instant now = Instant.now();
