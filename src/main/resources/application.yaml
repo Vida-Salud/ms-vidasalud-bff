@@ -44,6 +44,9 @@ spring:
 vidasalud:
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:4200}   # lista separada por comas
+  # Proxies de confianza delante del BFF, para saber qué valor de X-Forwarded-For es el cliente real.
+  # 0 en local (el navegador habla directo con el BFF); 1 en AWS, detrás del API Gateway.
+  proxies-de-confianza: ${PROXIES_DE_CONFIANZA:0}
 
 logging:
   pattern:
